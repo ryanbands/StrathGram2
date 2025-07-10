@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The manifest tag is the root element and must include the package attribute. -->
+<!-- Replace "com.example.strathgram2" with your actual application's package name. -->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.example.strathgram2"> <!-- IMPORTANT: Ensure this matches your project's package -->
+
+    <!-- The application tag contains all components of your app. -->
+    <application
+        android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.Strathgram2"> <!-- Ensure your theme is correctly defined -->
+
+        <!-- Declaration for RegisterActivity -->
+        <activity android:name=".RegisterActivity"
+            android:exported="false" /> <!-- Set exported to false if not accessed by other apps -->
+
+        <!-- Declaration for LoginActivity -->
+        <!-- This activity is set as the main launcher activity for your app. -->
+        <activity android:name=".LoginActivity"
+            android:exported="true"> <!-- Set exported to true for launcher activity -->
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+
+        <activity android:name=".HomeActivity"
+            android:exported="false" />
+
+
+        <activity android:name=".ChatActivity"
+            android:exported="false" />
+
+    </application>
+
+</manifest>
+

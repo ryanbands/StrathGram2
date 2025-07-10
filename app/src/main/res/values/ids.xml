@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="logEmail" type="id" />
+    <item name="logPass" type="id" />
+    <item name="logBtn" type="id" />
+    <item name="goRegister" type="id" />
+    <item name="regEmail" type="id" />
+    <item name="regPass" type="id" />
+    <item name="regBtn" type="id" />
+    <item name="chatScroll" type="id" />
+</resources>
