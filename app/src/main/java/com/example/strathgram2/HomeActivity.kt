@@ -7,25 +7,25 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 
 class HomeActivity : AppCompatActivity() {
-    private var userEmail = ""
+    private var userEmail: String = "Unknown"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         setContentView(R.layout.activity_home)
 
+        userEmail = intent.getStringExtra("user_email") ?: "Unknown"
 
-        userEmail = intent.getStringExtra("user") ?: "Unknown"
+        val userTextView: TextView = findViewById(R.id.userText)
+        userTextView.text = "Logged in as: $userEmail"
 
+        val chatButton: Button = findViewById(R.id.chatBtn)
+        chatButton.setOnClickListener {
 
-        findViewById<TextView>(R.id.userText).text = "Logged in as: $userEmail"
-
-
-        findViewById<Button>(R.id.chatBtn).setOnClickListener {
-
-            startActivity(
-                Intent(this, ChatActivity::class.java).putExtra("user", userEmail)
-            )
+            val intent = Intent(this, ChatActivity::class.java).apply {
+                putExtra("user", userEmail)
+            }
+            startActivity(intent)
         }
     }
 }
+

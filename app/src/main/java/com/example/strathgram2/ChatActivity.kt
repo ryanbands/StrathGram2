@@ -1,98 +1,118 @@
 package com.example.strathgram2
 
+import android.graphics.Color
 import android.os.Bundle
+import android.view.Gravity
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
-import android.view.Gravity 
-import android.graphics.Color
-import androidx.compose.foundation.layout.Box
 
 class ChatActivity : AppCompatActivity() {
-    private lateinit var db: AppDatabase // Instance of your SQLite database helper
-    private lateinit var container: LinearLayout // The LinearLayout to hold chat bubbles
-    private var user: String = "" // The current logged-in user's identifier
+
+
+    private lateinit var db: AppDatabase
+    private lateinit var container: LinearLayout
+    private lateinit var msgInput: EditText
+    private lateinit var sendBtn: Button
+    private lateinit var chatScrollView: ScrollView
+
+    private var currentUserEmail: String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_chat) // Set the layout for this activity
+        setContentView(R.layout.activity_chat)
 
-        // Initialize the database instance
         db = AppDatabase(this)
-        // Retrieve the user identifier passed from the previous activity (e.g., HomeActivity)
-        // Default to "Anon" if no user is provided.
-        user = intent.getStringExtra("user") ?: "Anon"
-
-        // Initialize UI elements by finding them from the layout
-        container = findViewById(R.id.chatContainer) // The container for chat bubbles
-        val input = findViewById<EditText>(R.id.msgInput) // Input field for new messages
-        val sendBtn = findViewById<Button>(R.id.sendBtn) // Button to send messages
 
 
-        Box {
-            loadMessages()
-        }
+        currentUserEmail = intent.getStringExtra("user") ?: "Anon"
 
-        
-            val text = input.text.toString() // Get the text from the input field
-            if (text.isNotBlank()) { // Check if the message is not empty or just whitespace
-                db.addMessage(user, text) // Add the message to the database
-                addBubble(user, text) // Display the message as a chat bubble
-                input.text.clear() // Clear the input field after sending
+
+        container = findViewById(R.id.chatContainer)
+        msgInput = findViewById(R.id.msgInput)
+        sendBtn = findViewById(R.id.sendBtn)
+        chatScrollView = findViewById(R.id.chatScroll)
+
+
+        loadMessages()
+
+
+        sendBtn.setOnClickListener {
+
+            val messageText = msgInput.text.toString().trim()
+
+
+            if (messageText.isNotBlank()) {
+
+                db.addMessage(currentUserEmail, messageText)
+
+                addBubble(currentUserEmail, messageText)
+
+
+                msgInput.text.clear()
+
+                chatScrollView.post {
+                    chatScrollView.fullScroll(ScrollView.FOCUS_DOWN)
+                }
             }
         }
     }
 
-    // Loads all messages from the database and displays them as chat bubbles
+
     private fun loadMessages() {
-        container.removeAllViews() // Clear any existing views in the container
-        db.getAllMessages().forEach { m ->
-            // For each ChatMessage object retrieved, add a chat bubble
-            addBubble(m.author, m.body)
+
+        container.removeAllViews()
+
+
+        db.getAllMessages().forEach { message ->
+            addBubble(message.author, message.body)
+        }
+
+
+        chatScrollView.post {
+            chatScrollView.fullScroll(ScrollView.FOCUS_DOWN)
         }
     }
 
-    // Adds a new chat bubble (TextView) to the chat container
+
     private fun addBubble(author: String, body: String) {
-        val tv = TextView(this).apply {
-            text = "$author: $body" // Set the text of the bubble
-            textSize = 16f // Set text size
-            setPadding(24, 12, 24, 12) // Add padding inside the bubble
-            // Set background and text color based on whether the message is from the current user
-            if (author == user) {
-                setBackgroundResource(R.drawable.bubble_right) // Custom drawable for sender
-                setTextColor(Color.WHITE) // White text for sender's bubble
-                gravity = Gravity.END // Align sender's bubble to the right
+
+        val messageBubble = TextView(this).apply {
+            text = "$author: $body"
+            textSize = 16f
+            setPadding(24, 12, 24, 12)
+
+            if (author == currentUserEmail) {
+
+                setBackgroundResource(R.drawable.bubble_right)
+                setTextColor(Color.WHITE)
             } else {
-                setBackgroundResource(R.drawable.bubble_left) // Custom drawable for receiver
-                setTextColor(Color.BLACK) // Black text for receiver's bubble
-                gravity = Gravity.START // Align receiver's bubble to the left
+
+                setBackgroundResource(R.drawable.bubble_left)
+                setTextColor(Color.BLACK)
             }
         }
 
-        // Create a LinearLayout to hold the TextView and control its margins
-        val bubbleLayout = LinearLayout(this).apply {
+
+        val bubbleWrapperLayout = LinearLayout(this).apply {
+
             layoutParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
             ).apply {
-                // Add margins to separate bubbles
+
                 setMargins(0, 8, 0, 8)
             }
-            // Add the TextView (chat bubble) to this layout
-            addView(tv)
-            // Set gravity for the bubble within its parent layout
-            if (author == user) {
-                gravity = Gravity.END // Align the entire bubble layout to the right
+
+            addView(messageBubble)
+
+
+            if (author == currentUserEmail) {
+                gravity = Gravity.END
             } else {
-                gravity = Gravity.START // Align the entire bubble layout to the left
+                gravity = Gravity.START
             }
         }
 
-        container.addView(bubbleLayout) // Add the bubble layout to the main chat container
-
-        // Scroll to the bottom of the ScrollView to show the latest message
-        findViewById<ScrollView>(R.id.chatScroll).post {
-            it.fullScroll(ScrollView.FOCUS_DOWN)
-        }
+        container.addView(bubbleWrapperLayout)
     }
 }
